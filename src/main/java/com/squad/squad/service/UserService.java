@@ -34,6 +34,9 @@ public class UserService {
         if (user == null) {
             throw new IllegalArgumentException("User is Null");
         }
+        if (user.equals(new User())) {
+            throw new IllegalArgumentException("User Cannot be Empty");
+        }
         if (user.getFirstName().isEmpty() || user.getFirstName().isBlank()) {
             throw new IllegalArgumentException("User Firstname is Empty");
         }

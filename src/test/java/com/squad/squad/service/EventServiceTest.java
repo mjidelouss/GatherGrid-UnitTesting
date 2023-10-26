@@ -12,6 +12,7 @@ import java.sql.Time;
 import java.util.Date;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 class EventServiceTest {
     private EventRepository eventRepository;
@@ -96,11 +97,12 @@ class EventServiceTest {
 
     @Test
     void deleteEvent() {
-        User organiser = new User(1L, "LittleJumper", "John", "Doe", "mjid.elouss@gmail.com", "password");
-        Category category = new Category("WEB");
-        Event event = new Event(1L,"Event 1", new Date(), Time.valueOf("12:21:21"), "YouCode", "Event 1 Test Description", category, organiser);
-        Mockito.when(eventRepository.getEvent(event.getId()));
-        assertDoesNotThrow(()-> eventService.deleteEvent(event.getId()));
+        Event event = new Event();
+        event.setId(1L);
+        doNothing().when(eventRepository).deleteEvent(event.getId());
+        Mockito.when(eventRepository.getEvent(event.getId())).thenReturn(event);
+        eventService.deleteEvent(event.getId());
+        verify(eventRepository, times(1)).deleteEvent(event.getId());
     }
 
     @Test
@@ -109,6 +111,7 @@ class EventServiceTest {
 
     @Test
     void getAllEvents() {
+
     }
 
     @Test

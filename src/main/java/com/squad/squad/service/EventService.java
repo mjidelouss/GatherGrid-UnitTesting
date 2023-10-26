@@ -1,4 +1,5 @@
 package com.squad.squad.service;
+import com.squad.squad.domain.Category;
 import com.squad.squad.domain.User;
 import com.squad.squad.repository.EventRepository;
 
@@ -87,6 +88,9 @@ public class EventService {
         if (event == null) {
             throw new IllegalArgumentException("Event cannot be null");
         }
+        if (event.equals(new Event())) {
+            throw new IllegalArgumentException("Event cannot be Empty");
+        }
         if (event.getName() == null || event.getName().isEmpty() || event.getName().isBlank()) {
             throw new IllegalArgumentException("Event name is required");
         }
@@ -107,6 +111,9 @@ public class EventService {
         }
         if (event.getCategory() == null || event.getCategory().getName().isEmpty()) {
             throw new IllegalArgumentException("Event Category is required");
+        }
+        if (event.getCategory().equals(new Category())) {
+            throw new IllegalArgumentException("Category cannot be Empty");
         }
     }
 
