@@ -16,8 +16,30 @@ public class EventService {
     }
 
     public Event saveEvent(Event event) {
+        if (event == null) {
+            throw new IllegalArgumentException("Event cannot be null");
+        }
+        if (event.getName() == null || event.getName().isEmpty() || event.getName().isBlank()) {
+            throw new IllegalArgumentException("Event name is required");
+        }
+        if (event.getDate() == null) {
+            throw new IllegalArgumentException("Event date is required");
+        }
+        if (event.getHour() == null) {
+            throw new IllegalArgumentException("Event hour is required");
+        }
+        if (event.getPlace() == null || event.getPlace().isEmpty() || event.getName().isBlank()) {
+            throw new IllegalArgumentException("Event place is required");
+        }
+        if (event.getOrganiser() == null) {
+            throw new IllegalArgumentException("Event organizer is required");
+        }
+        if (event.getCategory() == null) {
+            throw new IllegalArgumentException("Event Category is required");
+        }
         return eventRepository.saveEvent(event);
     }
+
 
     public List<Event> searchEvents(String name, Date date, String hour, String place) {
         String jpql = "SELECT e FROM Event e WHERE 1=1";

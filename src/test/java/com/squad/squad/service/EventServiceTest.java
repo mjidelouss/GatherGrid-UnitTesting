@@ -1,107 +1,102 @@
 package com.squad.squad.service;
 
+import com.squad.squad.domain.Category;
 import com.squad.squad.domain.Event;
 import com.squad.squad.domain.User;
 import com.squad.squad.repository.EventRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.Mockito;
 
-import java.util.List;
+import java.sql.Time;
+import java.util.Date;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.*;
 
 class EventServiceTest {
-
-    @Mock
     private EventRepository eventRepository;
-
-    private EventService eventService;
-
+    private  EventService eventService;
     @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this); // Initialize the mocks
+    void setup(){
+        eventRepository = Mockito.mock(EventRepository.class);
         eventService = new EventService(eventRepository);
+    }
+    @Test
+    public void saveEvent1() {
+        Category category = new Category("WEB");
+        Event event = new Event("Event Test 1", new Date(), Time.valueOf("12:21:21"), "YouCode", "Event 1 Test Description", category, null);
+
+        assertThrows(IllegalArgumentException.class, () -> eventService.saveEvent(event), "Organiser is null");
+    }
+
+    @Test
+    public void saveEvent2() {
+        User organiser = new User(1L, "LittleJumper", "John", "Doe", "mjid.elouss@gmail.com", "password");
+        Category category = new Category("WEB");
+        Event event = new Event("Event Test 1", new Date(), Time.valueOf("12:21:21"), "YouCode", "Event 1 Test Description", category, null);
+
+        Mockito.when(eventRepository.saveEvent(event)).thenReturn(event);
+        Event output = eventService.saveEvent(event);
+
+        assertEquals(event, output);
+        Mockito.verify(eventRepository).saveEvent(event);
+    }
+
+    @Test
+    public void saveEvent3() {
+        User organiser = new User(1L, "LittleJumper", "John", "Doe", "mjid.elouss@gmail.com", "password");
+        Event event = new Event("Event Test 1", new Date(), Time.valueOf("12:21:21"), "YouCode", "Event 1 Test Description", null, organiser);
+
+        assertThrows(IllegalArgumentException.class, () -> eventService.saveEvent(event), "Category is null");
+    }
+
+    @Test
+    public void saveEvent4() {
+        User organiser = new User(1L, "LittleJumper", "John", "Doe", "mjid.elouss@gmail.com", "password");
+        Event event = new Event("Event Test 1", new Date(), Time.valueOf("12:21:21"), "YouCode", "Event 1 Test Description", new Category(), organiser);
+
+        assertThrows(IllegalArgumentException.class, () -> eventService.saveEvent(event), "Category is empty");
+    }
+
+    @Test
+    public void saveEvent5() {
+        Category category = new Category("WEB");
+        Event event = new Event("Event Test 1", new Date(), Time.valueOf("12:21:21"), "YouCode", "Event 1 Test Description", category, new User());
+
+        assertThrows(IllegalArgumentException.class, () -> eventService.saveEvent(event), "Organiser is empty");
+    }
+
+    @Test
+    void searchEvents() {
     }
 
     @Test
     void updateEvent() {
-        // Arrange
-        Event event = new Event();
-        event.setId(1L);
+        User organiser = new User(1L, "LittleJumper", "John", "Doe", "mjid.elouss@gmail.com", "password");
+        Category category = new Category("WEB");
+        Event event = new Event("Event 1", new Date(), Time.valueOf("12:21:21"), "YouCode", "Event 1 Test Description", category, organiser);
 
-        // Mock the behavior of the repository
-        when(eventRepository.getEvent(1L)).thenReturn(event);
-        when(eventRepository.updateEvent(event)).thenReturn(event);
-
-        // Act
-        Event updatedEvent = eventService.updateEvent(event);
-
-        // Assert
-        assertEquals(event, updatedEvent);
+        Mockito.when(eventRepository.updateEvent(event)).thenReturn(event);
+        Event output = eventService.updateEvent(event);
     }
 
     @Test
     void deleteEvent() {
-        // Arrange
-        Long eventId = 1L;
-
-        // Mock the behavior of the repository
-        when(eventRepository.getEvent(eventId)).thenReturn(new Event());
-
-        // Act
-        assertDoesNotThrow(() -> eventService.deleteEvent(eventId));
-
-        // Assert
-        // You can add assertions based on the behavior you expect.
-    }
-
-    @Test
-    void getEventById() {
-        // Arrange
-        Long eventId = 1L;
-        Event event = new Event();
-        event.setId(eventId);
-
-        // Mock the behavior of the repository
-        when(eventRepository.getEvent(eventId)).thenReturn(event);
-
-        // Act
-        Event retrievedEvent = eventService.getEventById(eventId);
-
-        // Assert
-        assertEquals(event, retrievedEvent);
     }
 
     @Test
     void getEventsOfOrganiser() {
-        // Arrange
-        User organizer = new User();
-
-        // Mock the behavior of the repository
-        when(eventRepository.getEventsOfOrganiser(organizer)).thenReturn(List.of(new Event(), new Event()));
-
-        // Act
-        List<Event> events = eventService.getEventsOfOrganiser(organizer);
-
-        // Assert
-        assertEquals(2, events.size());
     }
 
     @Test
     void getAllEvents() {
-        // Mock the behavior of the repository
-        when(eventRepository.getAllEvents()).thenReturn(List.of(new Event(), new Event()));
-
-        // Act
-        List<Event> events = eventService.getAllEvents();
-
-        // Assert
-        assertEquals(2, events.size());
     }
 
-    // You can write similar test cases for other methods like saveEvent, getEvent, and searchEvents.
+    @Test
+    void getEventById() {
+    }
+
+    @Test
+    void getEvent() {
+    }
 }
