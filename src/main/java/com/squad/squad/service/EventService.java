@@ -25,9 +25,9 @@ public class EventService {
     }
 
 
-    public List<Event> searchEvents(String name, Date date, String hour, String place) {
-        String jpql = "SELECT e FROM Event e WHERE 1=1";
-        if (name != null && !name.isEmpty()) {
+    public List<Event> searchEvents(String name, Date date, String hour, String place, String jpql) {
+        jpql = "SELECT e FROM Event e WHERE 1=1";
+        if (name != null && !name.isEmpty() && !name.isBlank()) {
             jpql += " AND e.name LIKE :name";
         }
         if (date != null) {
@@ -36,7 +36,7 @@ public class EventService {
         if (hour != null && !hour.isEmpty()) {
             jpql += " AND e.hour = :hour";
         }
-        if (place != null && !place.isEmpty()) {
+        if (place != null && !place.isEmpty() && !place.isBlank()) {
             jpql += " AND e.place LIKE :place";
         }
         return eventRepository.searchEvents(name, date, hour, place, jpql);
@@ -66,7 +66,14 @@ public class EventService {
         return eventRepository.getEventsOfOrganiser(org);
     }
 
-    public List<Event> getAllEvents() {return eventRepository.getAllEvents();}
+    public List<Event> getAllEvents() {
+        List<Event> events = eventRepository.getAllEvents();
+        if (events == null) {
+            throw new RuntimeException("Failed to retrieve events from the repository");
+        }
+        return events;
+    }
+
 
     public Event getEventById(Long id) {
         Event event = eventRepository.getEvent(id);

@@ -7,9 +7,10 @@ import com.squad.squad.repository.EventRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-
 import java.sql.Time;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -77,7 +78,21 @@ class EventServiceTest {
 
     @Test
     void searchEvents() {
+        String name = "EventName";
+        Date date = new Date();
+        String hour = "12:00:00";
+        String place = "EventPlace";
+        String jpql = "SELECT e FROM Event e WHERE 1=1";
+        String jpql1 = "SELECT e FROM Event e WHERE 1=1 AND e.name LIKE :name AND e.date = :date AND e.hour = :hour AND e.place LIKE :place";
 
+        List<Event> expectedEvents = new ArrayList<>();
+        expectedEvents.add(new Event(1L, "Event 1", date, Time.valueOf(hour), place, "Event 1 Test Description", new Category("WEB"), new User()));
+        expectedEvents.add(new Event(2L, "Event 2", date, Time.valueOf(hour), place, "Event 2 Test Description", new Category("WEB"), new User()));
+
+        Mockito.when(eventRepository.searchEvents(name, date, hour, place, jpql1)).thenReturn(expectedEvents);
+        List<Event> result = eventService.searchEvents(name, date, hour, place, jpql);
+
+        assertEquals(expectedEvents, result);
     }
 
     @Test
@@ -111,14 +126,25 @@ class EventServiceTest {
 
     @Test
     void getAllEvents() {
+        User organizer = new User(1L, "LittleJumper", "John", "Doe", "mjid.elouss@gmail.com", "password");
+        Category category = new Category("WEB");
+        List<Event> events = new ArrayList<>();
+        events.add(new Event(1L, "Event 1", new Date(), Time.valueOf("12:21:21"), "YouCode", "Event 1 Test Description", category, organizer));
+        events.add(new Event(2L, "Event 2", new Date(), Time.valueOf("12:21:21"), "YouCode", "Event 2 Test Description", category, organizer));
 
+        Mockito.when(eventRepository.getAllEvents()).thenReturn(events);
+        List<Event> result = eventService.getAllEvents();
+
+        assertEquals(events, result);
     }
 
     @Test
     void getEventById() {
-    }
+        Long eventId = 1L;
+        Event expectedEvent = new Event(eventId, "Event 1", new Date(), Time.valueOf("12:21:21"), "YouCode", "Event 1 Test Description", new Category("WEB"), new User());
+        Mockito.when(eventRepository.getEvent(eventId)).thenReturn(expectedEvent);
 
-    @Test
-    void getEvent() {
+        Event result = eventService.getEventById(eventId);
+        assertEquals(expectedEvent, result);
     }
 }
