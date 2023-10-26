@@ -4,39 +4,22 @@ import com.squad.squad.repository.EventRepository;
 
 import com.squad.squad.domain.Event;
 import com.squad.squad.repository.EventRepository;
+import com.squad.squad.repository.UserRepository;
 
 import java.util.Date;
 import java.util.List;
 
 public class EventService {
     private final EventRepository eventRepository;
+    private final UserService userService = new UserService();
 
     public EventService(EventRepository eventRepository) {
         this.eventRepository = eventRepository;
     }
 
     public Event saveEvent(Event event) {
-        if (event == null) {
-            throw new IllegalArgumentException("Event cannot be null");
-        }
-        if (event.getName() == null || event.getName().isEmpty() || event.getName().isBlank()) {
-            throw new IllegalArgumentException("Event name is required");
-        }
-        if (event.getDate() == null) {
-            throw new IllegalArgumentException("Event date is required");
-        }
-        if (event.getHour() == null) {
-            throw new IllegalArgumentException("Event hour is required");
-        }
-        if (event.getPlace() == null || event.getPlace().isEmpty() || event.getName().isBlank()) {
-            throw new IllegalArgumentException("Event place is required");
-        }
-        if (event.getOrganiser() == null) {
-            throw new IllegalArgumentException("Event organizer is required");
-        }
-        if (event.getCategory() == null) {
-            throw new IllegalArgumentException("Event Category is required");
-        }
+        validateEventData(event);
+        userService.validateUserData(event.getOrganiser());
         return eventRepository.saveEvent(event);
     }
 
@@ -58,13 +41,12 @@ public class EventService {
         return eventRepository.searchEvents(name, date, hour, place, jpql);
     }
     public Event updateEvent(Event event) {
-        if (event == null) {
-            throw new IllegalArgumentException("Event cannot be null");
-        }
         Event existingEvent = eventRepository.getEvent(event.getId());
         if (existingEvent == null) {
             throw new IllegalArgumentException("Event with ID " + event.getId() + " does not exist");
         }
+        validateEventData(event);
+        userService.validateUserData(event.getOrganiser());
         return eventRepository.updateEvent(event);
     }
 
@@ -101,6 +83,32 @@ public class EventService {
         return event;
     }
 
+    public void validateEventData(Event event) {
+        if (event == null) {
+            throw new IllegalArgumentException("Event cannot be null");
+        }
+        if (event.getName() == null || event.getName().isEmpty() || event.getName().isBlank()) {
+            throw new IllegalArgumentException("Event name is required");
+        }
+        if (event.getDate() == null) {
+            throw new IllegalArgumentException("Event date is required");
+        }
+        if (event.getDate().before(new Date())) {
+            throw new IllegalArgumentException("Event date is not Valid");
+        }
+        if (event.getHour() == null) {
+            throw new IllegalArgumentException("Event hour is required");
+        }
+        if (event.getPlace() == null || event.getPlace().isEmpty() || event.getName().isBlank()) {
+            throw new IllegalArgumentException("Event place is required");
+        }
+        if (event.getOrganiser() == null) {
+            throw new IllegalArgumentException("Event organizer is required");
+        }
+        if (event.getCategory() == null || event.getCategory().getName().isEmpty()) {
+            throw new IllegalArgumentException("Event Category is required");
+        }
+    }
 
 }
 

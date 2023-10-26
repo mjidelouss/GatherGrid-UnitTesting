@@ -23,6 +23,18 @@ public class Event {
     public Event() {
     }
 
+    public Event(Long id, String name, Date date, Time hour, String place, String description, Category category, User organiser) {
+        this.id = id;
+        this.name = name;
+        this.date = date;
+        this.hour = hour;
+        this.place = place;
+        this.description = description;
+        this.category = category;
+        this.organiser = organiser;
+        this.tickets = tickets;
+    }
+
     public Event(String name, Date date, Time hour, String place, String description, Category category, User organiser) {
         this.name = name;
         this.date = date;

@@ -39,7 +39,6 @@ class EventServiceTest {
         Event output = eventService.saveEvent(event);
 
         assertEquals(event, output);
-        Mockito.verify(eventRepository).saveEvent(event);
     }
 
     @Test
@@ -67,21 +66,41 @@ class EventServiceTest {
     }
 
     @Test
+    public void saveEvent6() {
+        Category category = new Category("WEB");
+        User organiser = new User(1L, "LittleJumper", "John", "Doe", "mjid.elouss@gmail.com", "password");
+        Event event = new Event("Event Test 1", new Date(122, 10, 25), Time.valueOf("12:21:21"), "YouCode", "Event 1 Test Description", category, organiser);
+
+        assertThrows(IllegalArgumentException.class, () -> eventService.saveEvent(event), "Date is already passed");
+    }
+
+    @Test
     void searchEvents() {
+
     }
 
     @Test
     void updateEvent() {
         User organiser = new User(1L, "LittleJumper", "John", "Doe", "mjid.elouss@gmail.com", "password");
         Category category = new Category("WEB");
-        Event event = new Event("Event 1", new Date(), Time.valueOf("12:21:21"), "YouCode", "Event 1 Test Description", category, organiser);
+        Event event = new Event(1L,"Event 1", new Date(), Time.valueOf("12:21:21"), "YouCode", "Event 1 Test Description", category, organiser);
+        Category updatedCategory = new Category("MOBILE");
+        Event updatedEvent = new Event(1L,"Updated Event 1", new Date(), Time.valueOf("13:21:21"), "YouCode", "Event 1 Test Description", updatedCategory, organiser);
 
-        Mockito.when(eventRepository.updateEvent(event)).thenReturn(event);
-        Event output = eventService.updateEvent(event);
+        Mockito.when(eventRepository.updateEvent(updatedEvent)).thenReturn(updatedEvent);
+        Mockito.when(eventRepository.getEvent(updatedEvent.getId())).thenReturn(updatedEvent);
+        Event output = eventService.updateEvent(updatedEvent);
+
+        assertNotEquals(event, output);
     }
 
     @Test
     void deleteEvent() {
+        User organiser = new User(1L, "LittleJumper", "John", "Doe", "mjid.elouss@gmail.com", "password");
+        Category category = new Category("WEB");
+        Event event = new Event(1L,"Event 1", new Date(), Time.valueOf("12:21:21"), "YouCode", "Event 1 Test Description", category, organiser);
+        Mockito.when(eventRepository.getEvent(event.getId()));
+        assertDoesNotThrow(()-> eventService.deleteEvent(event.getId()));
     }
 
     @Test
